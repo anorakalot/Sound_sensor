@@ -2,7 +2,8 @@
 #define echo_pin 12
 #define led 7
 
-
+//LED GOES ON WHEN DISTANCE IS LESS THAN 20
+//YOU CAN CHECK EXACT DISTANCE IN THE SERIAL MONITOR AS WELL
 void setup() {
 Serial.begin(9600);
 pinMode(trig_pin,OUTPUT);
