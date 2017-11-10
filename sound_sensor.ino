@@ -1,5 +1,4 @@
 /*add more music options and serial available to choose each one*/
-
 #define trig_pin 13
 #define echo_pin 12
 #define led_1 7
@@ -27,7 +26,7 @@ void setup() {
   pinMode(piezo,OUTPUT);
   //inputs for music selection
   Serial.println("Welcome to the Security Program");
-  Serial.println("Which music do you wnat?");
+  Serial.println("Which alarm do you wnat?");
   Serial.println("1. Ascending 2. Descending 3. Single Low  4. Single High");
   Serial.println();
   Serial.println("If you want to go back to change your music selection just press 9 during the program!");
