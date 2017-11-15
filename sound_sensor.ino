@@ -1,16 +1,19 @@
-/*add more music options and serial available to choose each one*/
 #define trig_pin 13
 #define echo_pin 12
 #define led_1 7
 #define led_2 6
 #define piezo 3
+#define quick_button 9
 
 //GLOBAL VARIABLES
+char input_array[] = {'1','2','3','4','5','6','7','8','9','q','w','e','r','t'};
 int myarray[] = {0,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000};
 short myarraysize = 21;
 char input;
 char  goback_input;
-
+//bool checker = true;
+char while_loop_breaker;
+int counter = 0;
 //delay variables
 int ascend_descend_delay = 50;
 int beats_delay = 50;
@@ -20,39 +23,48 @@ int oh_biscuits_delay = 20;
 
 
 //MAKE SURE YOU UPDATE myarraysize WHEN YOU CHANGE MYARRAY ELEMENTS SIZE
+//MAKE SURE WHEN YOU UPDATE input_array YOU CHANGE INPUT_ARRAY ELEMENT SIZE
 
 //LED GOES ON WHEN DISTANCE IS LESS THAN 20
 //YOU CAN CHECK EXACT DISTANCE IN THE SERIAL MONITOR AS WELL
 
+
 void setup() {
-  randomSeed(analogRead(0));
   Serial.begin(9600);
+  randomSeed(analogRead(0));
+  //randomSeed(random(0,200000)); 
+  //pinmode for pins for the piezo, led, and sound sensor
   pinMode(trig_pin,OUTPUT);
   pinMode(echo_pin,INPUT);
   pinMode(led_1,OUTPUT);
   pinMode(led_2,OUTPUT);
   pinMode(piezo,OUTPUT);
+  pinMode(quick_button,INPUT);
   //inputs for music selection
-  Serial.println("Welcome to the Security Program");
-  Serial.println("Which alarm do you wnat?");
+  Serial.println("Welcome to the Laptop Security Program!");
+  Serial.println("Which alarm do you what?");
   Serial.println("1. Ascending 2. Descending 3. Single Low  4. Single High 5.Single Mid 6. Beats 7. Beats_2 ");
   Serial.println("8.Bells 9.Bells_2 q.Bump_Low w.Bump_Mid e.Bump_High r.Normal Alarm(Low To High) t.OhBiscuits ");
   Serial.println();
-  Serial.println("If you want to go back to change your music selection just press R during the program running!");
+  Serial.println("If you want to go back to change your music selection just press R when the programs running!");
   input = '?';
-  while(input == '?'){ //|| input != '1' || input != '2'){
+  while(input == '?') {
   if(Serial.available() > 0){
     input = Serial.read();
     delay(500);
     //end of input reading in loop
     }
-    /*
-   if (input != '1' || input != '2'){
-    input = NULL;
-    Serial.println("Wrong Input!");
-    //end of wrong input checker
-   }
-   */
+  if (digitalRead(quick_button) == HIGH){
+    delay(300);
+    digitalWrite(led_2,HIGH);
+    delay(1000);
+    digitalWrite(led_2,LOW);
+    counter ++;
+    if (counter > 13){
+      counter = 0;
+    }
+    input = input_array[counter];
+  }
   //end of while loop
   }
   //end of setup function
@@ -141,7 +153,6 @@ void bump_mid(){
 }
 
 
-
 void bump_high(){
   tone(3,myarray[20]);
   delay(bump_delay);
@@ -150,12 +161,10 @@ void bump_high(){
 }
 
 
-
 void normal_alarm(){
   tone(3,myarray[0]);
   tone(3,myarray[20]);
 }
-
 
 void oh_biscuits(){
   tone(3,myarray[random(0,21)]);
@@ -167,30 +176,16 @@ void oh_biscuits(){
   tone(3,myarray[random(0,21)]);
 }
 
-/*
-void super_mario(){
-  tone(3,myarray[20]);
-  delay(1000);
-  tone(3,myarray[10]);
-  delay(100);
-  tone(3,myarray[0]);
-  delay(100);
-  tone(3,myarray[5]);
-  delay(50);
-  tone(3,myarray[7]);
-  delay(50);
-  
-}
-*/
-
-
 //end of music selections8
 void nomusic(){
+  digitalWrite(led_1,LOW);
+  digitalWrite(led_2,LOW);
   noTone(3);
 }
 
 
 void loop() {
+
   long duration;
   long distance;
   digitalWrite(trig_pin,LOW);
@@ -201,7 +196,7 @@ void loop() {
   duration = pulseIn(echo_pin,HIGH);
   distance = (duration/2) / 29.1;
   Serial.println(distance);
-
+  
   if (distance<30){
     digitalWrite(led_1,HIGH);
     digitalWrite(led_2,HIGH);
@@ -237,7 +232,7 @@ void loop() {
     else if (input == 'q'){
       bump_low();
     }
-    
+
     else if (input == 'w'){
       bump_mid();
     }
@@ -249,20 +244,18 @@ void loop() {
     else if(input == 'r'){
       normal_alarm();
     }
-    
+
     else if(input == 't'){
       oh_biscuits();
     }
-    
+
     else{
       ascending();
     }
   //end of distance alarm if conditions
    }
-   
+
   else{
-    digitalWrite(led_1,LOW);
-    digitalWrite(led_2,LOW);
     nomusic();
     //end of no alarm else statement
   }
@@ -271,8 +264,16 @@ if (Serial.available()> 0){
     delay(500);
 
 if (goback_input == 'R'){
+  nomusic();
+  setup();
+   }
+  }
+
+//end of go back input checker
+if (digitalRead(quick_button) == HIGH){
+  nomusic();
   setup();
   }
-}
-//end of go back input checker
+
+//end of void loop
 }
